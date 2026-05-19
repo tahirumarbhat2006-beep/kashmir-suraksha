@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kashmir Suraksha - Complete Emergency System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); min-height: 100vh; padding: 16px; }
+        .container { max-width: 550px; margin: 0 auto; }
+        .sos-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 48px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { background: rgba(220,38,38,0.2); width: 80px; height: 80px; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 2px solid #dc2626; }
+        .logo i { font-size: 2.8rem; color: #dc2626; }
+        .header h1 { color: white; font-size: 1.8rem; font-weight: 800; }
+        .header p { color: #94a3b8; font-size: 0.85rem; margin-top: 6px; }
+        .lang-selector { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
+        .lang-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 15px; border-radius: 30px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .lang-btn.active { background: #1e4a3b; }
+        .sos-btn-area { display: flex; justify-content: center; margin: 20px 0 30px; }
+        .sos-main-btn { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); width: 220px; height: 220px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 4px solid #fff; animation: pulse 2s infinite; transition: 0.3s; }
+        .sos-main-btn:hover { transform: scale(1.05); animation: none; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.7); } 70% { box-shadow: 0 0 0 25px rgba(220,38,38,0); } 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); } }
+        .sos-main-btn i { font-size: 4.5rem; color: white; margin-bottom: 12px; }
+        .sos-main-btn span { color: white; font-weight: 800; font-size: 1.8rem; letter-spacing: 4px; }
+        .emergency-types { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 25px 0; }
+        .type-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .type-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+        .type-btn i { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+        .type-btn.police i { color: #3b82f6; }
+        .type-btn.medical i { color: #10b981; }
+        .type-btn.fire i { color: #f59e0b; }
+        .type-btn.disaster i { color: #ef4444; }
+        .type-btn span { color: white; font-size: 0.85rem; font-weight: 500; }
+        .helplines { background: rgba(255,255,255,0.05); border-radius: 24px; padding: 16px; margin: 20px 0; }
+        .helplines h3 { color: white; font-size: 0.9rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .helpline-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .helpline-item { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .helpline-item:hover { background: rgba(255,255,255,0.15); transform: scale(1.05); }
+        .helpline-item i { font-size: 1.3rem; display: block; margin-bottom: 5px; }
+        .helpline-item .number { color: #94a3b8; font-size: 0.7rem; font-weight: 600; }
+        .helpline-item .label { color: white; font-size: 0.7rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 32px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #fee2e2; }
+        .modal-header h2 { color: #dc2626; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6b7280; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 1.5px solid #e5e7eb; border-radius: 16px; font-size: 0.95rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #dc2626; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .location-status { background: #eff6ff; border-radius: 12px; padding: 10px; margin-top: 10px; font-size: 0.8rem; color: #1e40af; display: flex; align-items: center; gap: 8px; }
+        .get-location-btn { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 40px; width: 100%; cursor: pointer; margin-top: 8px; font-weight: 600; transition: 0.2s; }
+        .get-location-btn:hover { background: #2563eb; transform: translateY(-2px); }
+        .send-sos-btn { background: #dc2626; color: white; border: none; padding: 14px; border-radius: 40px; width: 100%; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .send-sos-btn:hover { background: #b91c1c; transform: translateY(-2px); }
+        .user-info { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .user-name { color: white; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .user-name i { color: #10b981; }
+        .logout-btn { background: rgba(255,255,255,0.1); color: #fca5a5; border: 1px solid #dc2626; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+        .login-section { background: rgba(255,255,255,0.05); border-radius: 24px; padding: 24px; margin-bottom: 20px; }
+        .login-section h3 { color: white; margin-bottom: 16px; text-align: center; }
+        .login-input { width: 100%; padding: 14px; border-radius: 40px; margin-bottom: 12px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 1rem; }
+        .login-input::placeholder { color: #94a3b8; }
+        .login-btn { background: #1e4a3b; color: white; border: none; padding: 14px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1f2937; color: white; padding: 12px 24px; border-radius: 50px; z-index: 1100; display: none; }
+        .toast.show { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        .radio-option { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .footer-links { text-align: center; margin-top: 20px; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.7rem; margin: 0 10px; transition: 0.2s; }
+        .footer-links a:hover { color: #10b981; }
+        .footer-links span { color: #334155; font-size: 0.7rem; }
+        .timer { color: #dc2626; font-size: 0.7rem; margin-top: 5px; }
+        .otp-display { background: #1e4a3b; color: white; padding: 10px; border-radius: 12px; text-align: center; margin: 10px 0; font-size: 1.2rem; font-weight: bold; letter-spacing: 4px; }
+        @media (max-width: 480px) { .sos-main-btn { width: 180px; height: 180px; } .form-row { grid-template-columns: 1fr; gap: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        // ==================== AUDIO FOR SOS ====================
+        function playSOSSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,U3RlYWx0aCBpcyBhIHN0ZWFraW5nIGVtZXJnZW5jeSBzb3VuZA==');
+                audio.play().catch(e => console.log('Audio play failed'));
+            } catch(e) {}
+        }
+
+        // ==================== 3 LANGUAGES ====================
+        const translations = {
+            en: { appName: "Kashmir Suraksha", tagline: "One Tap Can Save a Life", sos: "SOS", police: "Police", medical: "Medical", fire: "Fire", disaster: "Disaster", helplines: "Emergency Helplines", loginTitle: "Quick Access", phone: "Phone Number", name: "Your Name", loginBtn: "Send OTP", verifyBtn: "Verify OTP", logout: "Exit", emergencyForm: "Emergency Alert Form", fullName: "Full Name", phoneNum: "Phone Number", age: "Age", location: "Exact Location", district: "District", emergencyType: "Emergency Type", describe: "Describe the Situation", peopleAffected: "Number of People Affected", confirm: "I confirm this is a genuine emergency", sendAlert: "SEND EMERGENCY ALERT", getLocation: "Get My Current Location", calling: "Calling", alertSent: "EMERGENCY ALERT SENT!", helpOnWay: "Help is on the way!", fillRequired: "Please fill all required fields!", validPhone: "Please enter a valid 10-digit phone number!", confirmCheck: "Please confirm emergency details!", welcome: "Welcome! You can now send SOS alerts", policeEmergency: "🚔 POLICE EMERGENCY", medicalEmergency: "🏥 MEDICAL EMERGENCY", fireEmergency: "🔥 FIRE EMERGENCY", disasterAlert: "🌊 DISASTER ALERT", privacyPolicy: "Privacy Policy", contact: "Contact", version: "Version", otpSent: "OTP sent", otpVerify: "Enter OTP", resendOTP: "Resend OTP", rateLimit: "Please wait", seconds: "seconds before sending another SOS", sosCooldown: "SOS Cooldown" },
+            hi: { appName: "कश्मीर सुरक्षा", tagline: "एक टैप से बचाएं जान", sos: "एसओएस", police: "पुलिस", medical: "चिकित्सा", fire: "अग्निशमन", disaster: "आपदा", helplines: "आपातकालीन हेल्पलाइन", loginTitle: "त्वरित पहुंच", phone: "फोन नंबर", name: "आपका नाम", loginBtn: "ओटीपी भेजें", verifyBtn: "ओटीपी सत्यापित करें", logout: "बाहर निकलें", emergencyForm: "आपातकालीन सूचना फॉर्म", fullName: "पूरा नाम", phoneNum: "फोन नंबर", age: "उम्र", location: "सटीक स्थान", district: "जिला", emergencyType: "आपातकालीन प्रकार", describe: "स्थिति का वर्णन करें", peopleAffected: "प्रभावित लोगों की संख्या", confirm: "मैं पुष्टि करता हूँ कि यह वास्तविक आपातकाल है", sendAlert: "आपातकालीन अलर्ट भेजें", getLocation: "मेरी वर्तमान स्थान प्राप्त करें", calling: "कॉल कर रहे हैं", alertSent: "आपातकालीन अलर्ट भेज दिया गया!", helpOnWay: "सहायता आ रही है!", fillRequired: "कृपया सभी आवश्यक फील्ड भरें!", validPhone: "कृपया 10 अंकों का वैध फोन नंबर डालें!", confirmCheck: "कृपया आपातकालीन विवरण पुष्टि करें!", welcome: "स्वागत है! अब आप एसओएस अलर्ट भेज सकते हैं", policeEmergency: "🚔 पुलिस आपातकाल", medicalEmergency: "🏥 चिकित्सा आपातकाल", fireEmergency: "🔥 अग्नि आपातकाल", disasterAlert: "🌊 आपदा चेतावनी", privacyPolicy: "गोपनीयता नीति", contact: "संपर्क करें", version: "संस्करण", otpSent: "ओटीपी भेजा गया", otpVerify: "ओटीपी दर्ज करें", resendOTP: "ओटीपी पुनः भेजें", rateLimit: "कृपया प्रतीक्षा करें", seconds: "सेकंड", sosCooldown: "एसओएस प्रतीक्षा" },
+            ur: { appName: "کشمیر سیکورٹی", tagline: "ایک ٹیپ جان بچا سکتی ہے", sos: "ایس او ایس", police: "پولیس", medical: "طبی", fire: "فائر", disaster: "آفت", helplines: "ایمرجنسی ہیلپ لائنز", loginTitle: "فوری رسائی", phone: "فون نمبر", name: "آپ کا نام", loginBtn: "او ٹی پی بھیجیں", verifyBtn: "او ٹی پی تصدیق کریں", logout: "باہر نکلیں", emergencyForm: "ایمرجنسی الرٹ فارم", fullName: "پورا نام", phoneNum: "فون نمبر", age: "عمر", location: "عین مقام", district: "ضلع", emergencyType: "ایمرجنسی کی قسم", describe: "صورتحال بیان کریں", peopleAffected: "متاثرہ افراد کی تعداد", confirm: "میں تصدیق کرتا ہوں کہ یہ حقیقی ایمرجنسی ہے", sendAlert: "ایمرجنسی الرٹ بھیجیں", getLocation: "میرا موجودہ مقام حاصل کریں", calling: "کال کر رہے ہیں", alertSent: "ایمرجنسی الرٹ بھیج دیا گیا!", helpOnWay: "مدد راہ پر ہے!", fillRequired: "براہ کرم تمام ضروری فیلڈز پُر کریں!", validPhone: "براہ کرم 10 ہندسوں کا درست فون نمبر درج کریں!", confirmCheck: "براہ کرم ایمرجنسی کی تفصیلات کی تصدیق کریں!", welcome: "خوش آمدید! اب آپ ایس او ایس الرٹ بھیج سکتے ہیں", policeEmergency: "🚔 پولیس ایمرجنسی", medicalEmergency: "🏥 طبی ایمرجنسی", fireEmergency: "🔥 آگ ایمرجنسی", disasterAlert: "🌊 آفت کا الرٹ", privacyPolicy: "رازداری کی پالیسی", contact: "رابطہ کریں", version: "ورژن", otpSent: "او ٹی پی بھیج دیا گیا", otpVerify: "او ٹی پی درج کریں", resendOTP: "او ٹی پی دوبارہ بھیجیں", rateLimit: "براہ کرم انتظار کریں", seconds: "سیکنڈ", sosCooldown: "ایس او ایس کا وقفہ" }
+        };
+        let currentLang = "en";
+        function t(key) { return translations[currentLang][key] || translations.en[key] || key; }
+
+        // ==================== DATABASE ====================
+        const srinagarHospitals = [
+            { name: "SKIMS Hospital Soura", phone: "0194-2401010", distance: "2.5km", address: "Soura" },
+            { name: "SMHS Hospital", phone: "0194-2452272", distance: "1.2km", address: "Karan Nagar" }
+        ];
+        const srinagarPolice = [
+            { name: "Police Station Zakoora", phone: "0194-2414168", distance: "500m", address: "Zakura" }
+        ];
+        const srinagarFire = [
+            { name: "Fire Station Hqr Srinagar", phone: "101", distance: "1km", address: "Hqr Srinagar" }
+        ];
+
+        const anantnagHospitals = [
+            { name: "GMC Anantnag", phone: "01932-222866", distance: "1km", address: "Anantnag City" }
+        ];
+        const anantnagPolice = [
+            { name: "Police Station Anantnag", phone: "01932-222866", distance: "800m", address: "Anantnag City" }
+        ];
+        const anantnagFire = [
+            { name: "Fire Station Anantnag-I", phone: "101", distance: "800m", address: "Anantnag City" }
+        ];
+
+        const baramullaHospitals = [
+            { name: "GMC Baramulla", phone: "01952-234210", distance: "1km", address: "Baramulla" }
+        ];
+        const baramullaPolice = [
+            { name: "Police Station Baramulla", phone: "9596767710", distance: "600m", address: "Baramulla" }
+        ];
+        const baramullaFire = [
+            { name: "Fire Station Baramulla-I", phone: "101", distance: "600m", address: "Baramulla" }
+        ];
+
+        const budgamHospitals = [
+            { name: "District Hospital Budgam", phone: "01951-255223", distance: "1km", address: "Budgam" }
+        ];
+        const budgamPolice = [
+            { name: "Police Station Budgam", phone: "01951-255223", distance: "500m", address: "Budgam" }
+        ];
+        const budgamFire = [
+            { name: "Fire Station Budgam", phone: "01951-255222", distance: "500m", address: "Budgam" }
+        ];
+
+        const bandiporaHospitals = [
+            { name: "District Hospital Bandipora", phone: "01957-225278", distance: "1km", address: "Bandipora" }
+        ];
+        const bandiporaPolice = [
+            { name: "Police Station Bandipora", phone: "01957-225278", distance: "700m", address: "Bandipora" }
+        ];
+        const bandiporaFire = [
+            { name: "Fire Station Bandipora", phone: "01957-225222", distance: "600m", address: "Bandipora" }
+        ];
+
+        const ganderbalHospitals = [
+            { name: "District Hospital Ganderbal", phone: "0194-2416225", distance: "1km", address: "Ganderbal" }
+        ];
+        const ganderbalPolice = [
+            { name: "Police Station Ganderbal", phone: "0194-2416225", distance: "600m", address: "Ganderbal" }
+        ];
+        const ganderbalFire = [
+            { name: "Fire Station Ganderbal", phone: "0194-2416390", distance: "500m", address: "Ganderbal" }
+        ];
+
+        const kupwaraHospitals = [
+            { name: "District Hospital Kupwara", phone: "01955-253339", distance: "1km", address: "Kupwara" }
+        ];
+        const kupwaraPolice = [
+            { name: "Police Station Kupwara", phone: "01955-253339", distance: "500m", address: "Kupwara" }
+        ];
+        const kupwaraFire = [
+            { name: "Fire Station Kupwara", phone: "101", distance: "500m", address: "Kupwara" }
+        ];
+
+        const kulgamHospitals = [
+            { name: "GMC Kulgam", phone: "01931-260221", distance: "1km", address: "Kulgam" }
+        ];
+        const kulgamPolice = [
+            { name: "Police Station Kulgam", phone: "01931-260221", distance: "600m", address: "Kulgam" }
+        ];
+        const kulgamFire = [
+            { name: "Fire Station Kulgam", phone: "01931-260222", distance: "600m", address: "Kulgam" }
+        ];
+
+        const pulwamaHospitals = [
+            { name: "District Hospital Pulwama", phone: "01933-241221", distance: "1km", address: "Pulwama" }
+        ];
+        const pulwamaPolice = [
+            { name: "Police Station Pulwama", phone: "01933-241221", distance: "500m", address: "Pulwama" }
+        ];
+        const pulwamaFire = [
+            { name: "Fire Station Pulwama", phone: "101", distance: "500m", address: "Pulwama" }
+        ];
+
+        const shopianHospitals = [
+            { name: "District Hospital Shopian", phone: "01933-261897", distance: "1km", address: "Shopian" }
+        ];
+        const shopianPolice = [
+            { name: "Police Station Shopian", phone: "01933-261897", distance: "400m", address: "Shopian" }
+        ];
+        const shopianFire = [
+            { name: "Fire Station Shopian", phone: "01933-260222", distance: "400m", address: "Shopian" }
+        ];
+
+        const disasterDatabase = {
+            "Srinagar": { name: "Disaster Control Room Srinagar", phone: "1077", distance: "2km", address: "DC Office Srinagar" },
+            "Anantnag": { name: "Disaster Management Anantnag", phone: "1077", distance: "1.5km", address: "DC Office Anantnag" },
+            "Baramulla": { name: "Disaster Management Baramulla", phone: "1077", distance: "1km", address: "DC Office Baramulla" },
+            "Budgam": { name: "Disaster Management Budgam", phone: "1077", distance: "1km", address: "DC Office Budgam" },
+            "Bandipora": { name: "Disaster Management Bandipora", phone: "1077", distance: "1km", address: "DC Office Bandipora" },
+            "Ganderbal": { name: "Disaster Management Ganderbal", phone: "1077", distance: "1km", address: "DC Office Ganderbal" },
+            "Kupwara": { name: "Disaster Management Kupwara", phone: "1077", distance: "1km", address: "DC Office Kupwara" },
+            "Kulgam": { name: "Disaster Management Kulgam", phone: "1077", distance: "1km", address: "DC Office Kulgam" },
+            "Pulwama": { name: "Disaster Management Pulwama", phone: "1077", distance: "1km", address: "DC Office Pulwama" },
+            "Shopian": { name: "Disaster Management Shopian", phone: "1077", distance: "1km", address: "DC Office Shopian" }
+        };
+
+        const hospitalsDatabase = {
+            "Srinagar": srinagarHospitals, "Anantnag": anantnagHospitals, "Baramulla": baramullaHospitals,
+            "Budgam": budgamHospitals, "Bandipora": bandiporaHospitals, "Ganderbal": ganderbalHospitals,
+            "Kupwara": kupwaraHospitals, "Kulgam": kulgamHospitals, "Pulwama": pulwamaHospitals, "Shopian": shopianHospitals
+        };
+        const policeDatabase = {
+            "Srinagar": srinagarPolice, "Anantnag": anantnagPolice, "Baramulla": baramullaPolice,
+            "Budgam": budgamPolice, "Bandipora": bandiporaPolice, "Ganderbal": ganderbalPolice,
+            "Kupwara": kupwaraPolice, "Kulgam": kulgamPolice, "Pulwama": pulwamaPolice, "Shopian": shopianPolice
+        };
+        const fireDatabase = {
+            "Srinagar": srinagarFire, "Anantnag": anantnagFire, "Baramulla": baramullaFire,
+            "Budgam": budgamFire, "Bandipora": bandiporaFire, "Ganderbal": ganderbalFire,
+            "Kupwara": kupwaraFire, "Kulgam": kulgamFire, "Pulwama": pulwamaFire, "Shopian": shopianFire
+        };
+
+        const districts = ["Srinagar", "Anantnag", "Baramulla", "Budgam", "Bandipora", "Ganderbal", "Kupwara", "Kulgam", "Pulwama", "Shopian"];
+        
+        const STORAGE_CURRENT = "ks_currentUser";
+        const STORAGE_REQUESTS = "ks_emergency_requests";
+
+        let currentUser = null;
+
+        function getNearestService(district, type) {
+            let database;
+            if (type === "medical") database = hospitalsDatabase;
+            else if (type === "police") database = policeDatabase;
+            else if (type === "fire") database = fireDatabase;
+            else if (type === "disaster") return disasterDatabase[district];
+            else return { name: "Emergency Services", phone: "112", distance: "Call Immediately" };
+            const services = database[district];
+            if (services && services.length > 0) return services[0];
+            return { name: `${type.toUpperCase()} Emergency`, phone: type === "medical" ? "102" : type === "police" ? "100" : "101", distance: "Contact" };
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = isError ? '#dc2626' : '#1f2937';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function getCurrentLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
+                        () => resolve({ lat: 34.074, lng: 74.806, isDemo: true })
+                    );
+                } else { resolve({ lat: 34.074, lng: 74.806, isDemo: true }); }
+            });
+        }
+
+        function saveEmergencyRequest(request) {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS) || "[]");
+            request.id = Date.now();
+            request.timestamp = new Date().toISOString();
+            request.status = "pending";
+            requests.unshift(request);
+            localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(requests));
+            return request;
+        }
+
+        async function getLocationForForm() {
+            const locationText = document.getElementById('locationText');
+            const locationInput = document.getElementById('emergencyLocation');
+            if (locationText) locationText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+            try {
+                const location = await getCurrentLocation();
+                if (locationInput) locationInput.value = location.isDemo ? "Srinagar, Kashmir (Demo)" : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+                if (locationText) locationText.innerHTML = '<i class="fas fa-check-circle" style="color: #10b981;"></i> Location captured!';
+                showToast("📍 Location captured!");
+            } catch (error) {
+                if (locationText) locationText.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i> Could not get location';
+                showToast("⚠️ Please enter location manually", true);
+            }
+        }
+
+        function openEmergencyForm(type) {
+            playSOSSound();
+            const modal = document.getElementById('emergencyModal');
+            const modalBody = document.getElementById('modalBody');
+            const typeNames = { police: t('policeEmergency'), medical: t('medicalEmergency'), fire: t('fireEmergency'), disaster: t('disasterAlert'), sos: t('policeEmergency') };
+            modalBody.innerHTML = `
+                <form id="emergencyForm" onsubmit="sendEmergency(event)">
+                    <div class="form-group"><label>${t('fullName')} *</label><input type="text" id="userName" value="${currentUser?.name || ''}" required></div>
+                    <div class="form-row"><div class="form-group"><label>${t('phoneNum')} *</label><input type="tel" id="userPhone" value="${currentUser?.phone || ''}" required></div><div class="form-group"><label>${t('age')}</label><input type="number" id="userAge" placeholder="${t('age')}"></div></div>
+                    <div class="form-group"><label>${t('location')} *</label><input type="text" id="emergencyLocation" required placeholder="Street, landmark, area"><div class="location-status"><i class="fas fa-map-marker-alt"></i> <span id="locationText">Click below to auto-detect</span></div><button type="button" class="get-location-btn" onclick="getLocationForForm()"><i class="fas fa-location-dot"></i> ${t('getLocation')}</button></div>
+                    <div class="form-row"><div class="form-group"><label>${t('district')} *</label><select id="userDistrict" required><option value="">Select District</option>${districts.map(d => `<option value="${d}">${d}</option>`).join('')}</select></div><div class="form-group"><label>${t('emergencyType')}</label><input type="text" value="${typeNames[type]}" readonly style="background:#fee2e2; font-weight:700; color:#dc2626;"></div></div>
+                    <div class="form-group"><label>${t('describe')} *</label><textarea id="emergencyDetails" rows="3" required placeholder="What happened? How many people?"></textarea></div>
+                    <div class="form-group"><label>${t('peopleAffected')}</label><input type="text" id="peopleAffected" placeholder="e.g., 1, 2, 5"></div>
+                    <div class="form-group"><label class="radio-option"><input type="checkbox" id="confirmDetails" required> <span>${t('confirm')}</span></label></div>
+                    <button type="submit" class="send-sos-btn"><i class="fas fa-paper-plane"></i> ${t('sendAlert')}</button>
+                </form>
+            `;
+            modal.classList.add('active');
+        }
+
+        function sendEmergency(event) {
+            event.preventDefault();
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            const location = document.getElementById('emergencyLocation').value;
+            const district = document.getElementById('userDistrict').value;
+            const details = document.getElementById('emergencyDetails').value;
+            if (!name || !phone || !location || !district || !details) { showToast(t('fillRequired'), true); return; }
+            if (!/^\d{10}$/.test(phone)) { showToast(t('validPhone'), true); return; }
+            if (!document.getElementById('confirmDetails').checked) { showToast(t('confirmCheck'), true); return; }
+            const emergencyTypeInput = document.querySelector('#modalBody input[readonly]');
+            let type = "police";
+            if (emergencyTypeInput?.value.includes("MEDICAL") || emergencyTypeInput?.value.includes("चिकित्सा")) type = "medical";
+            else if (emergencyTypeInput?.value.includes("FIRE") || emergencyTypeInput?.value.includes("अग्नि")) type = "fire";
+            else if (emergencyTypeInput?.value.includes("DISASTER") || emergencyTypeInput?.value.includes("आपदा")) type = "disaster";
+            const nearest = getNearestService(district, type);
+            const emergencyData = { userName: name, userPhone: phone, location: location, district: district, type: type, nearestService: nearest.name, nearestServicePhone: nearest.phone, details: details, peopleAffected: document.getElementById('peopleAffected').value || "1", status: "pending" };
+            saveEmergencyRequest(emergencyData);
+            showToast(`✅ ${t('alertSent')} ${nearest.name} ${t('helpOnWay')}`);
+            closeModal();
+            renderApp();
+        }
+
+        function closeModal() { document.getElementById('emergencyModal')?.classList.remove('active'); }
+        function callNumber(num) { window.location.href = `tel:${num}`; showToast(`${t('calling')} ${num}...`); }
+        
+        // ==================== OTP FUNCTIONS WITH VISIBLE OTP ====================
+        function generateOTP() { 
+            return Math.floor(100000 + Math.random() * 900000).toString(); 
+        }
+        
+        function sendLoginOTP() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+            if (!phone) { showToast(t('fillRequired'), true); return; }
+            if (!/^\d{10}$/.test(phone)) { showToast(t('validPhone'), true); return; }
+            
+            const otp = generateOTP();
+            localStorage.setItem(`otp_${phone}`, otp);
+            localStorage.setItem(`otp_time_${phone}`, Date.now().toString());
+            localStorage.setItem(`pending_name_${phone}`, name || "Emergency User");
+            
+            // OTP Show - Multiple ways to ensure visibility
+            document.getElementById('otpSection').style.display = 'block';
+            
+            // Show OTP in a styled div
+            const otpDiv = document.getElementById('otpDisplayDiv');
+            if (otpDiv) {
+                otpDiv.innerHTML = `<div class="otp-display"><i class="fas fa-key"></i> Your OTP: <strong style="font-size:1.5rem;">${otp}</strong></div>`;
+                otpDiv.style.display = 'block';
+            }
+            
+            // Show OTP in alert (most visible)
+            alert(`🔐 YOUR OTP IS: ${otp}\n\nPlease enter this 6-digit code to verify your number.\n\n(OTP valid for 5 minutes)`);
+            
+            // Show OTP in toast
+            showToast(`📱 ${t('otpSent')} ${phone}: ${otp}`, 8000);
+            
+            console.log(`OTP for ${phone}: ${otp}`);
+        }
+
+        function verifyLoginOTP() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const otp = document.getElementById('loginOTP').value.trim();
+            const savedOTP = localStorage.getItem(`otp_${phone}`);
+            const otpTime = localStorage.getItem(`otp_time_${phone}`);
+            
+            if (!savedOTP) { showToast("❌ No OTP sent. Please request OTP first.", true); return; }
+            if (!otp) { showToast("❌ Please enter OTP", true); return; }
+            if (Date.now() - parseInt(otpTime) > 300000) { showToast("❌ OTP expired. Please request again.", true); return; }
+            
+            if (savedOTP === otp) {
+                const name = localStorage.getItem(`pending_name_${phone}`) || "Emergency User";
+                currentUser = { name: name, phone: phone, isLoggedIn: true, loginTime: Date.now() };
+                localStorage.setItem(STORAGE_CURRENT, JSON.stringify(currentUser));
+                // Clear OTP display
+                const otpDiv = document.getElementById('otpDisplayDiv');
+                if (otpDiv) otpDiv.style.display = 'none';
+                renderApp();
+                showToast(`✅ ${t('welcome')}`);
+            } else { 
+                showToast("❌ Invalid OTP. Please check and try again.", true); 
+            }
+        }
+
+        function logout() { 
+            currentUser = null; 
+            localStorage.removeItem(STORAGE_CURRENT); 
+            renderApp(); 
+        }
+        
+        function changeLang(lang) { currentLang = lang; renderApp(); }
+
+        function renderLogin() {
+            return `
+                <div class="sos-card">
+                    <div class="header"><div class="logo"><i class="fas fa-shield-alt"></i></div><h1>${t('appName')}</h1><p>${t('tagline')}</p>
+                    <div class="lang-selector"><button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="changeLang('en')">English</button><button class="lang-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="changeLang('hi')">हिंदी</button><button class="lang-btn ${currentLang === 'ur' ? 'active' : ''}" onclick="changeLang('ur')">اردو</button></div></div>
+                    <div class="login-section">
+                        <h3><i class="fas fa-user-plus"></i> ${t('loginTitle')}</h3>
+                        <input type="tel" id="loginPhone" class="login-input" placeholder="${t('phone')}" value="9901234567">
+                        <input type="text" id="loginName" class="login-input" placeholder="${t('name')}" value="Emergency User">
+                        <button onclick="sendLoginOTP()" class="login-btn"><i class="fas fa-paper-plane"></i> ${t('loginBtn')}</button>
+                        <div id="otpDisplayDiv" style="display:none; margin: 10px 0;"></div>
+                        <div id="otpSection" style="display:none; margin-top:15px;">
+                            <input type="text" id="loginOTP" class="login-input" placeholder="${t('otpVerify')}">
+                            <button onclick="verifyLoginOTP()" class="login-btn" style="background:#10b981;"><i class="fas fa-check"></i> ${t('verifyBtn')}</button>
+                        </div>
+                    </div>
+                    <div class="helplines"><h3><i class="fas fa-phone-alt"></i> ${t('helplines')}</h3><div class="helpline-grid">
+                        <div class="helpline-item" onclick="callNumber('100')"><i class="fas fa-shield-haltered" style="color:#3b82f6;"></i><div class="number">100</div><div class="label">Police</div></div>
+                        <div class="helpline-item" onclick="callNumber('102')"><i class="fas fa-ambulance" style="color:#10b981;"></i><div class="number">102</div><div class="label">Ambulance</div></div>
+                        <div class="helpline-item" onclick="callNumber('101')"><i class="fas fa-fire-extinguisher" style="color:#f59e0b;"></i><div class="number">101</div><div class="label">Fire</div></div>
+                        <div class="helpline-item" onclick="callNumber('1090')"><i class="fas fa-female" style="color:#ec489a;"></i><div class="number">1090</div><div class="label">Women</div></div>
+                        <div class="helpline-item" onclick="callNumber('1098')"><i class="fas fa-child" style="color:#f59e0b;"></i><div class="number">1098</div><div class="label">Child</div></div>
+                        <div class="helpline-item" onclick="callNumber('1077')"><i class="fas fa-cloud-rain" style="color:#ef4444;"></i><div class="number">1077</div><div class="label">Disaster</div></div>
+                    </div></div>
+                    <div class="footer-links"><a href="privacy.html"><i class="fas fa-shield-alt"></i> ${t('privacyPolicy')}</a><span>|</span><a href="#"><i class="fas fa-envelope"></i> ${t('contact')}</a><span>|</span><span>${t('version')} 1.0</span></div>
+                </div>
+            `;
+        }
+
+        function renderMainApp() {
+            return `
+                <div class="sos-card">
+                    <div class="header"><div class="logo"><i class="fas fa-shield-alt"></i></div><h1>${t('appName')}</h1><p>${t('tagline')}</p>
+                    <div class="lang-selector"><button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="changeLang('en')">English</button><button class="lang-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="changeLang('hi')">हिंदी</button><button class="lang-btn ${currentLang === 'ur' ? 'active' : ''}" onclick="changeLang('ur')">اردو</button></div></div>
+                    <div class="user-info"><div class="user-name"><i class="fas fa-user-circle"></i> ${currentUser?.name} (${currentUser?.phone})</div><button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> ${t('logout')}</button></div>
+                    <div class="sos-btn-area"><div class="sos-main-btn" onclick="openEmergencyForm('sos')"><i class="fas fa-exclamation-triangle"></i><span>${t('sos')}</span></div></div>
+                    <div class="emergency-types"><div class="type-btn police" onclick="openEmergencyForm('police')"><i class="fas fa-shield-haltered"></i><span>${t('police')}</span></div><div class="type-btn medical" onclick="openEmergencyForm('medical')"><i class="fas fa-ambulance"></i><span>${t('medical')}</span></div><div class="type-btn fire" onclick="openEmergencyForm('fire')"><i class="fas fa-fire-extinguisher"></i><span>${t('fire')}</span></div><div class="type-btn disaster" onclick="openEmergencyForm('disaster')"><i class="fas fa-cloud-rain"></i><span>${t('disaster')}</span></div></div>
+                    <div class="helplines"><h3><i class="fas fa-phone-alt"></i> ${t('helplines')}</h3><div class="helpline-grid">
+                        <div class="helpline-item" onclick="callNumber('100')"><i class="fas fa-shield-haltered" style="color:#3b82f6;"></i><div class="number">100</div><div class="label">Police</div></div>
+                        <div class="helpline-item" onclick="callNumber('102')"><i class="fas fa-ambulance" style="color:#10b981;"></i><div class="number">102</div><div class="label">Ambulance</div></div>
+                        <div class="helpline-item" onclick="callNumber('101')"><i class="fas fa-fire-extinguisher" style="color:#f59e0b;"></i><div class="number">101</div><div class="label">Fire</div></div>
+                        <div class="helpline-item" onclick="callNumber('1090')"><i class="fas fa-female" style="color:#ec489a;"></i><div class="number">1090</div><div class="label">Women</div></div>
+                        <div class="helpline-item" onclick="callNumber('1098')"><i class="fas fa-child" style="color:#f59e0b;"></i><div class="number">1098</div><div class="label">Child</div></div>
+                        <div class="helpline-item" onclick="callNumber('1077')"><i class="fas fa-cloud-rain" style="color:#ef4444;"></i><div class="number">1077</div><div class="label">Disaster</div></div>
+                    </div></div>
+                    <div class="footer-links"><a href="privacy.html"><i class="fas fa-shield-alt"></i> ${t('privacyPolicy')}</a><span>|</span><a href="#"><i class="fas fa-envelope"></i> ${t('contact')}</a><span>|</span><span>${t('version')} 1.0</span></div>
+                </div>
+                <div id="emergencyModal" class="modal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-exclamation-triangle"></i> ${t('emergencyForm')}</h2><button class="close-modal" onclick="closeModal()">&times;</button></div><div id="modalBody"></div></div></div>
+                <div id="toast" class="toast"></div>
+            `;
+        }
+
+        function renderApp() {
+            const app = document.getElementById('app');
+            if (!currentUser || !currentUser.isLoggedIn) app.innerHTML = renderLogin();
+            else app.innerHTML = renderMainApp();
+        }
+
+        window.logout = logout; window.openEmergencyForm = openEmergencyForm;
+        window.closeModal = closeModal; window.getLocationForForm = getLocationForForm;
+        window.callNumber = callNumber; window.sendEmergency = sendEmergency; window.changeLang = changeLang;
+        window.sendLoginOTP = sendLoginOTP; window.verifyLoginOTP = verifyLoginOTP;
+
+        const stored = localStorage.getItem(STORAGE_CURRENT);
+        if (stored) { currentUser = JSON.parse(stored); if (currentUser?.isLoggedIn) currentUser.isLoggedIn = true; }
+        renderApp();
+    </script>
+</body>
+</html>
