@@ -83,7 +83,20 @@
 <body>
     <div class="container" id="app"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOFWZaKLZaukPdj8MS8bz-5s9wGqA4evs",
+            authDomain: "kashmir-suraksha-3e392.firebaseapp.com",
+            projectId: "kashmir-suraksha-3e392",
+            storageBucket: "kashmir-suraksha-3e392.firebasestorage.app",
+            messagingSenderId: "208630686616",
+            appId: "1:208630686616:web:67586456eb5f288ea5c1ed"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         // ==================== AUDIO FOR SOS ====================
         function playSOSSound() {
             try {
@@ -271,12 +284,14 @@
         }
 
         function saveEmergencyRequest(request) {
-            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS) || "[]");
-            request.id = Date.now();
+            request.id = Date.now().toString();
             request.timestamp = new Date().toISOString();
             request.status = "pending";
-            requests.unshift(request);
-            localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(requests));
+            
+            // Push to Firebase Realtime Database
+            db.ref('emergencies/' + request.id).set(request)
+              .catch(e => console.error("Firebase save error:", e));
+              
             return request;
         }
 

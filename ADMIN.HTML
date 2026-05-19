@@ -75,7 +75,20 @@
 <body>
     <div id="adminRoot"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOFWZaKLZaukPdj8MS8bz-5s9wGqA4evs",
+            authDomain: "kashmir-suraksha-3e392.firebaseapp.com",
+            projectId: "kashmir-suraksha-3e392",
+            storageBucket: "kashmir-suraksha-3e392.firebasestorage.app",
+            messagingSenderId: "208630686616",
+            appId: "1:208630686616:web:67586456eb5f288ea5c1ed"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const STORAGE_REQUESTS = "ks_emergency_requests";
         const STORAGE_ADMIN_SESSION = "ks_admin_session";
 
@@ -99,18 +112,36 @@
 
         function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
 
+        function playNotificationSound() {
+            try {
+                const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                audio.play().catch(e => console.log('Audio play blocked'));
+            } catch(e) {}
+        }
+
         function loadRequests() {
-            const stored = localStorage.getItem(STORAGE_REQUESTS);
-            if (stored) { appState.requests = JSON.parse(stored); }
-            else {
-                const demoRequests = [
-                    { id: 1001, userName: "Ahmad Rather", userPhone: "9419012345", location: "Zakura Crossing", district: "Srinagar", type: "medical", nearestService: "SKIMS Hospital", nearestServicePhone: "0194-2401010", details: "Road accident", peopleAffected: "1", timestamp: new Date().toISOString(), status: "pending" },
-                    { id: 1002, userName: "Fatima Begum", userPhone: "9906123456", location: "Nigeen Lake Road", district: "Srinagar", type: "police", nearestService: "Police Station Nigeen", nearestServicePhone: "0194-2414441", details: "Suspicious activity", peopleAffected: "2", timestamp: new Date(Date.now() - 3600000).toISOString(), status: "pending" },
-                    { id: 1003, userName: "Mohammad Yousuf", userPhone: "9596123456", location: "Hazratbal Road", district: "Srinagar", type: "fire", nearestService: "Fire Station Hazratbal", nearestServicePhone: "0194-2415045", details: "Fire in shop", peopleAffected: "3", timestamp: new Date(Date.now() - 7200000).toISOString(), status: "dispatched" }
-                ];
-                localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(demoRequests));
-                appState.requests = demoRequests;
-            }
+            db.ref('emergencies').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const newRequests = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    if (appState.requests.length > 0 && appState.loggedIn) {
+                        const oldPending = appState.requests.filter(r => r.status === 'pending').map(r => r.id);
+                        const newPending = newRequests.filter(r => r.status === 'pending').map(r => r.id);
+                        const hasNew = newPending.some(id => !oldPending.includes(id));
+                        
+                        if (hasNew) {
+                            playNotificationSound();
+                            showToast("🚨 NEW EMERGENCY ALERT RECEIVED!");
+                        }
+                    }
+                    
+                    appState.requests = newRequests;
+                } else {
+                    appState.requests = [];
+                }
+                if (appState.loggedIn) render();
+            });
         }
 
         function getFilteredRequests() {
@@ -132,7 +163,13 @@
 
         function dispatchRequest(id) {
             const req = appState.requests.find(r => r.id === id);
-            if (req && req.status === "pending") { req.status = "dispatched"; localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(appState.requests)); showToast(`✅ Emergency team dispatched for Request #${id}`); render(); }
+            if (req && req.status === "pending") {
+                db.ref('emergencies/' + id).update({ status: 'dispatched' })
+                  .then(() => {
+                      showToast(`✅ Emergency team dispatched for Request #${id}`);
+                  })
+                  .catch(e => console.error("Error dispatching:", e));
+            }
         }
 
         function login(username, password) {
